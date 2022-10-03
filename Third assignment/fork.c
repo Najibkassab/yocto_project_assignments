@@ -9,17 +9,17 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-/*Global varibales-----------------------------------*/
+/*Global Variables-----------------------------------*/
 #define MAXNUMBEROFLOCALVARIABLE 100
 #define MAXNUMBEROFSTRINGLITERAL 100
-char LocalVairbale[MAXNUMBEROFLOCALVARIABLE][MAXNUMBEROFSTRINGLITERAL];
-/*Function Prototype --------------------------------*/
+char LocalVariable[MAXNUMBEROFLOCALVARIABLE][MAXNUMBEROFSTRINGLITERAL];
+/*Functions Prototype --------------------------------*/
 int wordcount(char *buffer);
 void wordToken(char *buffer);
 void CommandPareser(void);
 bool isLocalVariable(char *buffer);
-bool FindVairbale(char *buffer, int *location);
-void SetEnv(char buffer[], char *NamerBuffer, char *ValueBuffer);
+bool FindVariable(char *buffer, int *location);
+void ParserEnv(char buffer[], char *NamerBuffer, char *ValueBuffer);
 /*main function--------------------------------------*/
 int main(int argc, char **argv) {
   pid_t PIDValue = 0;
@@ -71,7 +71,7 @@ void wordToken(char *buffer) {
   bool found = false;
   char nameenv[100] = {0};
   char valeenv[100] = {0};
-  int variableLocation = 0;
+  int VariableLocation = 0;
   static int LocalIndex = 0;
   char *ptr = NULL;
   int CommandNumber = wordcount(buffer);
@@ -81,7 +81,6 @@ void wordToken(char *buffer) {
     ptr = strtok(buffer, " ");
     while (ptr != NULL) {
       Command[index] = ptr;
-
       index++;
       ptr = strtok(NULL, " ");
     }
@@ -96,11 +95,11 @@ void wordToken(char *buffer) {
       execve(Command[0], argv1, envp1);
     } else if (!strcmp(Command[0], "set")) {
       for (int i = 0; i < LocalIndex; i++) {
-        printf("Local_variable[%d]:%s\r\n", i, LocalVairbale[i]);
+        printf("Local_vVariable[%d]:%s\r\n", i, LocalVariable[i]);
       }
     } else if (!strcmp(Command[0], "export")) {
-      if (FindVairbale(Command[1], &variableLocation)) {
-        SetEnv(LocalVairbale[variableLocation], nameenv, valeenv);
+      if (FindVariable(Command[1], &VariableLocation)) {
+        ParserEnv(LocalVariable[VariableLocation], nameenv, valeenv);
         if (!setenv(nameenv, valeenv, 1))
           printf("add success\r\n");
         else
@@ -117,12 +116,12 @@ void wordToken(char *buffer) {
       execvp(Command[0], argv2);
     }
   } else {
-    strcpy(&LocalVairbale[LocalIndex][0], buffer);
+    strcpy(&LocalVariable[LocalIndex][0], buffer);
     LocalIndex++;
   }
 }
 
-/*Local Vairbale ---------------------------------------------*/
+/*Local Variable ---------------------------------------------*/
 bool isLocalVariable(char *buffer) {
   for (int i = 0; i < strlen(buffer); i++) {
     if (buffer[i] == '=')
@@ -131,19 +130,19 @@ bool isLocalVariable(char *buffer) {
   return false;
 }
 
-/*Find Vairbale ---------------------------------------------*/
-bool FindVairbale(char *buffer, int *location) {
+/*Find Variable ---------------------------------------------*/
+bool FindVariable(char *buffer, int *location) {
   bool result = false;
   for (int i = 0; i < MAXNUMBEROFLOCALVARIABLE; i++) {
-    if (LocalVairbale[i][0] == buffer[0]) {
+    if (LocalVariable[i][0] == buffer[0]) {
       result = true;
       *location = i;
     }
   }
   return result;
 }
-/*Find Vairbale ---------------------------------------------*/
-void SetEnv(char *buffer, char *NamerBuffer, char *ValueBuffer) {
+/*Parser Environment Variable ---------------------------------------------*/
+void ParserEnv(char *buffer, char *NamerBuffer, char *ValueBuffer) {
   int Namelen = 0, Valuelen = 0;
 
   for (int i = 0; i < strlen(buffer); i++) {
