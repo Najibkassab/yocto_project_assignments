@@ -9,13 +9,15 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-/*Global Variables-----------------------------------*/
 
 
 /*PreProcessor Variables-----------------------------*/
 #define MAXNUMBEROFLOCALVARIABLE 100
 #define MAXNUMBEROFSTRINGLITERAL 100
+
+/*Global Variables-----------------------------------*/
 char LocalVariable[MAXNUMBEROFLOCALVARIABLE][MAXNUMBEROFSTRINGLITERAL];
+
 /*Functions Prototype --------------------------------*/
 int wordcount(char *buffer);
 void wordToken(char *buffer);
@@ -26,8 +28,6 @@ void ParserEnv(char buffer[], char *NamerBuffer, char *ValueBuffer);
 /*main function--------------------------------------*/
 int main(int argc, char **argv) {
   pid_t PIDValue = 0;
-  pid_t currentPID = 0;
-
   int *status;
 
   while (1) {
@@ -47,15 +47,12 @@ int main(int argc, char **argv) {
 
 /*Command Parser ------------------------------------------*/
 void CommandPareser(void) {
-  int wordNumber = 0;
   char buf[100];
   fgets(buf, 100, stdin);
   if (buf[0] != 0x0A) {
     buf[strlen(buf) - 1] = '\0';
     wordToken(buf);
-  } else {
-    printf("Enter pressed\r\n");
-  }
+  } 
 }
 
 /*Words counter --------------------------------------------*/
@@ -71,7 +68,6 @@ int wordcount(char *buffer) {
 
 /*Words tokner ---------------------------------------------*/
 void wordToken(char *buffer) {
-  bool found = false;
   char nameenv[100] = {0};
   char valeenv[100] = {0};
   int VariableLocation = 0;
@@ -98,17 +94,17 @@ void wordToken(char *buffer) {
       execve(Command[0], argv1, envp1);
     } else if (!strcmp(Command[0], "set")) {
       for (int i = 0; i < LocalIndex; i++) {
-        printf("Local_vVariable[%d]:%s\r\n", i, LocalVariable[i]);
+        printf("Local_Variable[%d]:%s\r\n", i, LocalVariable[i]);
       }
     } else if (!strcmp(Command[0], "export")) {
       if (FindVariable(Command[1], &VariableLocation)) {
         ParserEnv(LocalVariable[VariableLocation], nameenv, valeenv);
         if (!setenv(nameenv, valeenv, 1))
-          printf("add success\r\n");
+          printf("added successfully\r\n");
         else
           printf("add failed\r\n");
       } else
-        printf("vairbale not found\r\n");
+        printf("Variable not found\r\n");
 
     } else {
       char *argv2[] = {NULL};
