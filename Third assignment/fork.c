@@ -10,6 +10,9 @@
 #include <sys/wait.h>
 #include <unistd.h>
 /*Global Variables-----------------------------------*/
+
+
+/*PreProcessor Variables-----------------------------*/
 #define MAXNUMBEROFLOCALVARIABLE 100
 #define MAXNUMBEROFSTRINGLITERAL 100
 char LocalVariable[MAXNUMBEROFLOCALVARIABLE][MAXNUMBEROFSTRINGLITERAL];
@@ -59,7 +62,7 @@ void CommandPareser(void) {
 int wordcount(char *buffer) {
   int count = 0;
   for (int i = 0; i < strlen(buffer); i++) {
-    if (buffer[i] == ' ')
+    if (buffer[i] == ' ' && buffer[i+1] != ' ')
       count++;
   }
   count++;
